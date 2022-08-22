@@ -1,4 +1,4 @@
-import { Controller, HttpCode, Get, Param, Post, Body, Res, Put } from '@nestjs/common';
+import { Controller, HttpCode, Get, Param, Post, Body, Res, Put, Delete } from '@nestjs/common';
 import { CreateTaskDto, FilterTaskDto, UpdateTaskDto } from './task.dto';
 import { TaskService } from './task.service';
 import { Response } from 'express';
@@ -77,6 +77,20 @@ export class AuthenticatedTaskController {
     res.status(400).json({message: 'there is no data to update'}).end();
   };
 
+  @Delete(':taskID/author/:authorID')
+  destroy(
+    @Param('authorID') authorID: number,
+    @Param('taskID') taskID: number,
+    @Res() res: Response
+  ) {
+    return this.taskService.destroy(authorID, taskID)
+      .then((deleted) => {
+        res.status(deleted ? 200 : 404).end();
+      })
+      .catch((error) => {
+        res.status(500).json({message: error}).end();
+      })
+  }
 }
 
 @Controller('api/task')
@@ -88,7 +102,7 @@ export class UnauthenticatedTaskController {
   findAllPublic(
     @Body() filterTaskDto?: FilterTaskDto
   ) {
-    return this.taskService.findAllPublic(filterTaskDto);
+    return this.taskService.findAllPublic({...filterTaskDto, public: true});
   };
 
   @Get(':taskID')
@@ -97,7 +111,7 @@ export class UnauthenticatedTaskController {
     @Res() res: Response,
     @Body() filterTaskDto?: FilterTaskDto
   ) {
-    this.taskService.findOnePublic({...filterTaskDto, taskID})
+    this.taskService.findOnePublic({...filterTaskDto, taskID, public: true})
     .then((found) => {
       res.status(found ? 302 : 404).json({found}).end();
     })
