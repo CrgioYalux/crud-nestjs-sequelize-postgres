@@ -1,6 +1,7 @@
 import { AppConstant } from "src/app.constant";
 import { Sequelize } from 'sequelize-typescript';
 import { Config } from './database.config';
+import { Author } from '../author/author.model';
 
 export const databaseProvider = [
     {
@@ -21,9 +22,9 @@ export const databaseProvider = [
                 }
             );
 
-            sequelize.addModels([]);
+            sequelize.addModels([Author]);
 
-            await sequelize.sync();
+            await sequelize.sync({ force: true });
 
             return sequelize;
         }
