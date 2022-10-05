@@ -29,7 +29,8 @@ export const databaseProvider = [
               as: 'author'
             });
 
-            await sequelize.sync({ force: true });
+            // await sequelize.sync({ force: true });
+            await sequelize.sync();
 
             return sequelize;
         }
